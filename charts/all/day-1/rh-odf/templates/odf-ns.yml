@@ -1,0 +1,10 @@
+{{ if .Values.odf_enabled }}
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  name: openshift-storage
+  annotations:
+    openshift.io/node-selector: ""
+  labels:
+    openshift.io/cluster-monitoring: "true"
+{{ end }}

@@ -1,0 +1,10 @@
+{{ if .Values.serverless_enabled }}
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  name: openshift-serverless
+  annotations:
+    openshift.io/node-selector: ""
+  labels:
+    openshift.io/cluster-monitoring: "true"
+{{ end }}

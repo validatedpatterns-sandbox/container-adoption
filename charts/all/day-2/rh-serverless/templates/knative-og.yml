@@ -1,0 +1,10 @@
+{{ if .Values.serverless_enabled }}
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: serverless-operatorgroup
+  namespace: openshift-serverless
+spec:
+  targetNamespaces:
+  - openshift-serverless
+{{ end }}

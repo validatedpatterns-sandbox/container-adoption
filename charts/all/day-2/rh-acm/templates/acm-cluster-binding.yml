@@ -1,0 +1,11 @@
+{{ if .Values.mgmt_cluster }}
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: ManagedClusterSetBinding
+metadata:
+  name: "{{ .Values.organization }} -clusters"
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  clusterSet: "{{ .Values.organization }}-clusters"
+{{ end }}
