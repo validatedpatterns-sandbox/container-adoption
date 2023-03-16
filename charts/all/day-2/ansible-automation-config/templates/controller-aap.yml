@@ -1,4 +1,4 @@
-{{ .Values.aap_enabled }}
+{{ if .Values.aap_enabled }}
 apiVersion: automationcontroller.ansible.com/v1beta1
 kind: AutomationController
 metadata:
