@@ -1,0 +1,52 @@
+{{ if .Values.oadp_enabled }}
+apiVersion: oadp.openshift.io/v1alpha1
+kind: DataProtectionApplication
+metadata:
+  name: dpa-{{ (split "." .Values.global.localClusterDomain)._1 }}
+  namespace: open-cluster-management-backup
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  backupLocations:
+    - velero:
+        config:
+          profile: default
+          region: "{{ .Values.region }}"
+        credential:
+          key: cloud
+          name: cloud-credentials
+        default: true
+        objectStorage:
+          bucket: "{{ .Values.organization }}-{{ (split "." .Values.global.localClusterDomain)._1 }}-backup"
+          prefix: "{{ .Values.organization }}-{{ (split "." .Values.global.localClusterDomain)._1 }}"
+        provider: aws
+  configuration:
+    restic:
+      enable: true
+      podConfig:
+        resourceAllocations:
+          limits:
+            cpu: '1'
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+    velero:
+      defaultPlugins:
+        - openshift
+        - aws
+      podConfig:
+        resourceAllocations:
+          limits:
+            cpu: '1'
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+  snapshotLocations:
+    - velero:
+        config:
+          profile: default
+          region: "{{ .Values.region }}"
+        provider: aws
+{{ end }}

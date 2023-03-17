@@ -1,15 +1,21 @@
 clusterGroup:
   name: hub
   isHubCluster: true
-  # Note: setting this to true stores the vault unseal keys inside a cluster secret and
-  # is fundamentally insecure
-  insecureUnsealVaultInsideCluster: true
 
   namespaces:
   - open-cluster-management
   - vault
   - golang-external-secrets
   - config-demo
+  - ansible-automation-platform
+#  - openshift-file-integrity
+#  - group-sync-operator
+#  - openshift-compliance
+#  - openshift-redhat-operators
+#  - stackrox
+#  - open-cluster-management-backup
+#  - openshift-workspaces
+#  - openshift-serverless
 
   subscriptions:
     acm:
@@ -18,9 +24,73 @@ clusterGroup:
       channel: release-2.6
       #csv: advanced-cluster-management.v2.6.1
 
+    day2-amq-broker:
+      name: amq-broker-rhel8
+      source: redhat-operators
+      installPlanApproval: Manual
+      disbled: true
+
+    day2-aap:
+      name: ansible-automation-platform-operator
+      source: redhat-operators
+      disabled: false
+
+    day2-container-security:
+      name: container-security-operator
+      source: redhat-operators
+      disabled: true
+
+    day2-file-integrity-operator:
+      name: file-integrity-operator
+      source: redhat-operators
+      disabled: true
+
+    day2-gatekeeper-operator:
+      name: gatekeeper-operator-product
+      source: redhat-operators
+      disabled: true
+
+    day2-group-syn-operator:
+      name: group-sync-operator
+      namespace: group-sync-operator
+      source: community-operators
+      disabled: true
+
+    day2-compliance-operator:
+      name: openshift-compliance
+      namespace: openshift-compliance
+      source: redhat-operators
+      disabled: true
+
+    day2-elasticsearch-operator:
+      name: elasticsearch-operator
+      namespace: openshift-operators-redhat
+      source: redhat-operators
+      disabled: false
+
+    day2-rh-acs:
+      name: rhacs-operator  #packageName
+      namespace: openshift-operators # operator namespace
+
+    day2-rh-oadp:
+      name: redhat-oadp-operator  #packageName
+      namespace: open-cluster-management-backup # operator namespace
+
+    day2-codeready-workspaces:
+      name: codeready-workspaces  #packageName
+      namespace: openshift-workspaces # operator namespace
+      source: redhat-operators
+
+    day2-serverless:
+      name: serverless-operator  #packageName
+      namespace: openshift-serverless # operator namespace
+      source: redhat-operators
+      
+      
   projects:
   - hub
   - config-demo
+  - day-2
 
   applications:
     acm:
@@ -50,8 +120,130 @@ clusterGroup:
       name: config-demo
       namespace: config-demo
       project: config-demo
-      path: charts/all/config-demo
+      path: charts/all/config-demo      
 
+    day2-aap:
+      name: ansible-automation
+      project: day-2
+      path: charts/all/day-2/ansible-automation-config
+      overrides:
+      - name: aap_enabled
+        value: true
+
+#    day2-cluster-autoscaling:
+#      name: cluster-autoscaling
+#      project: day-2
+#      path: charts/all/day-2/cluster-autoscaling
+#
+#    day2-custom-console:
+#      name: custom-console
+#      namespace: openshift-console
+#      project: hub
+#      path: charts/all/day-2/custom-console
+#
+#    day2-gatekeeper-config:
+#      name: gatekeeper-config
+#      project: day-2
+#      path: charts/all/day-2/gatekeeper-config
+#      overrides:
+#      - name: gatekeeper_operator
+#        value: false
+#      - name: gk_ig_tag
+#        value: v3.3.0-18
+#      - name: allowed_git_repos
+#        value: https://github.org.gov
+#
+#    day2-groupsync:
+#      name: gatekeeper-config
+#      project: day-2
+#      path: charts/all/day-2/gatekeeper-config
+#      overrides:
+#      - name: oauth.groupsync_enabled
+#        value: false
+#      - name: gk_ig_tag
+#        value: v3.3.0-18
+#      - name: allowed_git_repos
+#        value: https://github.org.gov
+#
+#    day2-oauth:
+#      name: oauth
+#      project: day-2
+#      path: charts/day-2/oauth
+#      overrides:
+#      - name: ldapurl
+#        value: ldap://ds.example.com:389
+#      - name: binddn_uid
+#        value: dc=example,dc=com.
+#      - name: ldap_filter
+#        value: (&(objectClass=User)(department=Commercial))
+#      - name: okta_client_id
+#        value: 9999
+#      - name: okta_issuer
+#        value: jonny
+#
+#    day2-openshift_compliance_operator:
+#      name: openshift-compliance-config
+#      project: day-2
+#      path: charts/day-2/openshift-compliance-operator
+#      overrides:
+#      - name: openshift_compliance_operator
+#        value: false
+#
+#
+#    day2-openshift-logging:
+#      name: openshift-logging
+#      project: day2
+#      path: charts/day-2/openshift-logging
+#      overrides:
+#        - name: openshift_logging.enabled
+#          value: false
+#        - name: logging_namespace
+#          value: openshift-logging
+#        - name: fluentd_loglevel
+#          value: warn
+#        - name: region
+#          value: region
+#        - name: cluster_name
+#          value: cluster1
+#        - name: application_logs_max_age
+#          values: 1d
+#        - name: infra_logs_max_age
+#          value: 7d
+#        - name: elasticsearch_node_count
+#          value: 3
+#        - name: nkibana_replicas
+#          value: 1
+#        - name: curator_schedule
+#          value: "30 3 * * *"        
+#
+#    day2-oadp:
+#      name: rh-oadp
+#      project: day2
+#      path: charts/day-2/rh-adp
+#      overrides:
+#        - name: region
+#          value: region
+#        - name: organization
+#          value: org
+#        - name: oadp_enabled
+#          value: false
+#
+#    day2-codeready-workspaces:
+#      name: codeready-workspaces
+#      project: day2
+#      path: charts/day-2/rh-codeready-workspaces
+#      overrides:
+#        - name: code_ready_workspace_enabled
+#          value: false
+#
+#    day2-rh-serverless:
+#      name: rh-serverless
+#      project: day2
+#      path: charts/day-2/rh-serverless
+#      overrides:
+#        - name: serverless_enabled
+#          value: false
+          
   imperative:
     # NOTE: We *must* use lists and not hashes. As hashes lose ordering once parsed by helm
     # The default schedule is every 10 minutes: imperative.schedule
