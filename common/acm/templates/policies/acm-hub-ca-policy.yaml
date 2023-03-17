@@ -1,11 +1,11 @@
+# This pushes out the HUB's Certificate Authorities on to the imported clusters
+{{ if .Values.clusterGroup.isHubCluster }}
+---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: openshift-gitops-policy
+  name: acm-hub-ca-policy
   annotations:
-    policy.open-cluster-management.io/standards: NIST-CSF
-    policy.open-cluster-management.io/categories: PR.DS Data Security
-    policy.open-cluster-management.io/controls: PR.DS-1 Data-at-rest
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
@@ -16,7 +16,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: openshift-gitops-config
+          name: acm-hub-ca-config-policy
         spec:
           remediationAction: enforce
           severity: medium
@@ -26,44 +26,35 @@ spec:
           object-templates:
             - complianceType: mustonlyhave
               objectDefinition:
-                # This is an auto-generated file. DO NOT EDIT
-                apiVersion: operators.coreos.com/v1alpha1
-                kind: Subscription
+                kind: Secret
+                apiVersion: v1
+                type: Opaque
                 metadata:
-                  name: openshift-gitops-operator
-                  namespace: openshift-operators
-                  labels:
-                    operators.coreos.com/openshift-gitops-operator.openshift-operators: ''
-                spec:
-                  channel: stable
-                  installPlanApproval: Automatic
-                  name: openshift-gitops-operator
-                  source: redhat-operators
-                  sourceNamespace: openshift-marketplace
-                  config:
-                    env:
-                      - name: ARGOCD_CLUSTER_CONFIG_NAMESPACES
-                        value: "*"
+                  name: hub-ca
+                  namespace: imperative
+                data:
+                  hub-kube-root-ca.crt: '{{ `{{hub fromConfigMap "" "kube-root-ca.crt" "ca.crt" | base64enc hub}}` }}'
+                  hub-openshift-service-ca.crt: '{{ `{{hub fromConfigMap "" "openshift-service-ca.crt" "service-ca.crt" | base64enc hub}}` }}'
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: openshift-gitops-placement-binding
+  name: acm-hub-ca-policy-placement-binding
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 placementRef:
-  name: openshift-gitops-placement
+  name: acm-hub-ca-policy-placement
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-  - name: openshift-gitops-policy
+  - name: acm-hub-ca-policy
     kind: Policy
     apiGroup: policy.open-cluster-management.io
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: openshift-gitops-placement
+  name: acm-hub-ca-policy-placement
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
@@ -72,7 +63,9 @@ spec:
       type: ManagedClusterConditionAvailable
   clusterSelector:
     matchExpressions:
-      - key: vendor
-        operator: In
+      - key: local-cluster
+        operator: NotIn
         values:
-          - OpenShift
+          - 'true'
+{{ end }}
+
