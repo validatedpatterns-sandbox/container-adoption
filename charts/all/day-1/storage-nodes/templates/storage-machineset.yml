@@ -43,10 +43,10 @@ spec:
             creationTimestamp: null
           blockDevices:
             - ebs:
-                encrypted: {{ $.Values.storage.ebs.encrypted | default('true') }}
-                iops: {{ $.Values.storage.ebs.iops | default('0') }}
-                volumeSize: {{ $.Values.storage.ebs.volumesize | default('120') }}
-                volumeType: {{ $.Values.storage.ebs.volumetype | default('gp2') }}
+                encrypted: {{ $.Values.storage.ebs.encrypted | default true }}
+                iops: {{ $.Values.storage.ebs.iops | default 0 }}
+                volumeSize: {{ $.Values.storage.ebs.volumesize | default 120 }}
+                volumeType: {{ $.Values.storage.ebs.volumetype | default "gp2" }}
           securityGroups:
             - filters:
                 - name: 'tag:Name'

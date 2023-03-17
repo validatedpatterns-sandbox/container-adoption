@@ -1,6 +1,0 @@
-{{ if .Values.file_integrity_operator }}
-apiVersion: project.openshift.io/v1
-kind: Project
-metadata:
-  name: openshift-file-integrity
-{{ end }}

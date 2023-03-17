@@ -41,10 +41,10 @@ spec:
           apiVersion: awsproviderconfig.openshift.io/v1beta1
           blockDevices:
             - ebs:
-                encrypted: {{ $.Values.infra.ebs.encrypted | default('true') }}
-                iops: {{ $.Values.infra.ebs.iops | default('0') }}
-                volumeSize: {{ $.Values.infra.ebs.volumesize | default('120') }}
-                volumeType: {{ $.Values.infra.ebs.volumetype | default('gp2') }}
+                encrypted: {{ $.Values.infra.ebs.encrypted | default true }}
+                iops: {{ $.Values.infra.ebs.iops | default '0' }}
+                volumeSize: {{ $.Values.infra.ebs.volumesize | default 120  }}
+                volumeType: {{ $.Values.infra.ebs.volumetype | default "gp2"  }}
           credentialsSecret:
             name: aws-cloud-credentials
           deviceIndex: 0

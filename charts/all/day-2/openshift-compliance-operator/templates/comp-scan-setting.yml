@@ -31,4 +31,4 @@ scanTolerations:
 - effect: NoExecute
   key: infra
   value: reserved
-
+{{ end }}
